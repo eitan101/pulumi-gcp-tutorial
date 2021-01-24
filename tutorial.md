@@ -21,8 +21,7 @@ mkdir webserver && cd webserver
 pulumi new gcp-javascript
 ```
 
-```bash
-cat > index.js <<<EOF
+```js
 const gcp = require("@pulumi/gcp");
 
 // Create a network
@@ -50,7 +49,6 @@ const computeInstance = new gcp.compute.Instance("instance", {
 // Export the name and IP address of the Instance
 exports.instanceName = computeInstance.name;
 exports.instanceIP = computeInstance.networkInterfaces.apply(ni => ni[0].accessConfigs[0].natIp);
-EOF
 ```
 
 ```bash
@@ -63,11 +61,13 @@ pulumi stack
 
 ## Update
 
-```bash
-cat > kk.js <<<EOF
+```js
+const gcp = require("@pulumi/gcp");
 
+// Create a network
+const network = new gcp.compute.Network("network");
 const computeFirewall = new gcp.compute.Firewall("firewall", {
-    network: computeNetwork.id,
+    network: network.id,
     allows: [{
         protocol: "tcp",
         ports: [ "22", "80" ], // <-- ADD "80" HERE
@@ -79,6 +79,7 @@ const startupScript = `#!/bin/bash
 echo "Hello, World!" > index.html
 nohup python -m SimpleHTTPServer 80 &`;
 
+// Create a Virtual Machine Instance
 const computeInstance = new gcp.compute.Instance("instance", {
     machineType: "f1-micro",
     zone: "us-central1-a",
@@ -86,12 +87,14 @@ const computeInstance = new gcp.compute.Instance("instance", {
     bootDisk: { initializeParams: { image: "debian-cloud/debian-9" } },
     networkInterfaces: [{
         network: network.id,
-        // accessConfigus must include a single empty config to request an ephemeral IP
+        // accessConfigus must includ a single empty config to request an ephemeral IP
         accessConfigs: [{}],
     }],
 });
 
-EOF
+// Export the name and IP address of the Instance
+exports.instanceName = computeInstance.name;
+exports.instanceIP = computeInstance.networkInterfaces.apply(ni => ni[0].accessConfigs[0].natIp);
 ```
 
 ```bash
@@ -104,4 +107,7 @@ curl $(pulumi stack output instanceIP)
 
 ## Cleanup
 
-
+```bash
+pulumi destroy
+pulumi stack rm
+```
