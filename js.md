@@ -10,16 +10,13 @@
 curl -fsSL https://get.pulumi.com | sh
 ```
 
-```bash
-PATH=$HOME/.pulumi/bin:$PATH
-```
-
 ## Create a Pulumi Stack
-
 ```bash
 mkdir webserver && cd webserver
 pulumi new gcp-javascript
 ```
+
+When creating the new pulumi stack follow the link to generate a token and paste it in the console.
 
 ```js
 const gcp = require("@pulumi/gcp");
