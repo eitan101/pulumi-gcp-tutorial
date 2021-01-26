@@ -1,4 +1,4 @@
-# Tutorial on Pulumi in GCP
+# Pulumi in GCP Tutorial
 
 ### Prerequisites
 
@@ -106,5 +106,54 @@ curl $(pulumi stack output instanceIP)
 
 ```bash
 pulumi destroy
+```
+
+```bash
+pulumi stack rm
+```
+
+## Install Python dependencies
+
+```bash
+sudo apt-get install python3-venv
+pip3 install wheel
+```
+
+```bash
+git clone https://github.com/pulumi/examples.git
+cd examples/gcp-py-network-component/
+python3 -m venv venv
+source venv/bin/activate
+```
+
+```bash
+pip3 install -r requirements.txt
+```
+
+## Create a Pulumi stack using Python
+
+```bash
+pulumi stack init
+pulumi config set gcp:project codelab-eitany-prober
+pulumi config set gcp:region us-central1
+pulumi config set gcp:zone us-central1-b
+pulumi config set gcp-py-network-component:subnet_cidr_blocks '{ "172.31.0.0/20":0, "172.32.0.0/20":0 }'
+```
+
+```bash
+pulumi up
+```
+
+```bash
+curl $(pulumi stack output nginx_public_ip)
+```
+
+### Cleanup
+
+```bash
+pulumi destroy
+```
+
+```bash
 pulumi stack rm
 ```
